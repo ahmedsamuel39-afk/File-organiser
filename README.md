@@ -14,3 +14,4 @@ Features
 • classifies projects interactively
 • automatically moves folders
 • prevents duplicate sorting
+Useful for developers, students, and self-taught programmers who manage multiple coding projects, practice problems, and experiments, and want an automated way to organise their workspace.
