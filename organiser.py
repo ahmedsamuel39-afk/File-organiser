@@ -1,37 +1,39 @@
 import os
-# Root directory where all coding folders are stored
+
+"""Root directory where all coding folders are stored"""
 ROOT = 'Coding'
 
-# Target category folders
+""" Target category folders """
 folders = ["projects", "unfinished", "learning"]
 
-# Name of this script's directory (not currently used, but useful for future improvements)
-SCRIPT_DIR = os.path.basename(os.path.dirname(__file__))
-# Ensure all category folders exist (create them if missing)
-for folder in folders:
-    path = os.path.join(ROOT, folder)
-    os.makedirs(path, exist_ok=True)
+def ensure_folders_exist(root, folders):
+    """Create category folders if they do not exist."""
+    for folder in folders:
+        path = os.path.join(root, folder)
+        os.makedirs(path, exist_ok=True)
 
-# Get all items inside the root directory
-items = os.listdir(ROOT)
-projects = []
 
-# Filter only relevant project folders
-for item in items:
-    path = os.path.join(ROOT, item)
-    
-    if (
-        os.path.isdir(path) # only include folders (not files)
-        and item not in folders  # exclude category folders
-        and item != 'proj'  # exclude specific folder (custom rule)
-        and not item.startswith(".") # ignore hidden/system folders
-    ):
-        projects.append(item)
+def get_projects(root, folders):
+    """Return a list of project folders to classify."""
+    items = os.listdir(root)
+    projects = []
 
-for project in projects:
+    for item in items:
+        path = os.path.join(root, item)
 
+        if (
+            os.path.isdir(path)
+            and item not in folders
+            and item != 'proj'
+            and not item.startswith(".")
+        ):
+            projects.append(item)
+
+    return projects
+
+def classify_project(project):
+    """Ask user to classify a project and return category."""
     print(f"\nProject found: {project}")
-
     print("Choose category:")
     print("1 - projects")
     print("2 - unfinished")
@@ -39,25 +41,37 @@ for project in projects:
 
     choice = input("Enter number: ")
 
-     # Map user input to folder names
     mapping = {
         "1": "projects",
         "2": "unfinished",
         "3": "learning"
     }
 
-    category = mapping.get(choice)
+    return mapping.get(choice)
+
+
+def move_project(root, project, category):
+    """Move project folder into selected category."""
+    source = os.path.join(root, project)
+    destination = os.path.join(root, category, project)
+
+    if os.path.exists(source):
+        os.rename(source, destination)
+        print(f"Moved {project} → {category}")
+    else:
+        print(f"{project} already moved or missing")
+
+
+# --- Main Execution ---
+
+ensure_folders_exist(ROOT, folders)
+
+projects = get_projects(ROOT, folders)
+
+for project in projects:
+    category = classify_project(project)
 
     if category:
-        source = os.path.join(ROOT, project)
-        destination = os.path.join(ROOT, category, project)
-          
-        # Move the folder if it still exists
-        if os.path.exists(source):
-            os.rename(source, destination)
-            print(f"Moved {project} → {category}")
-        else:
-            print(f"{project} already moved or missing")
+        move_project(ROOT, project, category)
     else:
         print("Invalid choice, skipping...")
-
